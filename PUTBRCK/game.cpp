@@ -84,17 +84,17 @@ game::game(sf::RenderWindow &App) : App(App) {
 	}
 	pad = new paddle(App, tx["paddle"]);
 
-	for (float i = 0; i < 18; ++i) {
+	/*for (float i = 0; i < 18; ++i) {
 		for (float j = 0; j < 10; ++j) {
 			bricks.emplace_back(brick(tx["brick"], 1, 100, { i * tx["brick"].getSize().x + PLAYAREA_X + tx["brick"].getSize().x / 2 + 10, j * tx["brick"].getSize().y + PLAYAREA_Y + tx["brick"].getSize().y / 2 + 10 }));
 		}
-	}
+	}*/
 
-		/*level_.readFromFile("assets/levels/test.txt");
+		level_.readFromFile("assets/levels/spiral.txt");
 		level_.loadBricks(bricks);
 		for (auto &e : bricks) {
 			e.setTexture(tx["brick"]);
-		}*/
+		}
 
 
 	//quad.clear();

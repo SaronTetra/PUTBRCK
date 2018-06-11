@@ -37,6 +37,8 @@ int editor::Run() {
 	auto io = ImGui::GetIO();
 
 	static int selected = -1;
+	ImVec4 color(1.f, 1.f, 1.f,1.f);
+	bool brushMode = false;
 
 	sf::RectangleShape outline;
 	outline.setOutlineColor(sf::Color::Yellow);
@@ -90,46 +92,46 @@ int editor::Run() {
 				}
 			}
 		}
-		
-		ImGui::SFML::Update(App, elapsed_);
-		ImGui::ShowDemoWindow();
-		ImGui::SetNextWindowPos({ PLAYAREA_X + PLAYAREA_WIDTH, 0 });
-		ImGui::SetNextWindowSize({ App.getSize().x - PLAYAREA_X - PLAYAREA_WIDTH + 0.f, App.getSize().y + 0.f });
-		ImGui::Begin("editor");
-		ImVec2 elemSize = { ImGui::GetWindowSize().x, 50 };
-		std::string temp = InputBuf;
 
-		ImGui::Text("PUTBRCK EDITOR");
-		ImGui::Text("Level name:");
-		ImGui::CaptureKeyboardFromApp(true);
-		ImGui::InputText("", InputBuf, 32);
-		if (temp == "") {
-			ImGui::TextColored({ 255,255,0,255 }, "Name can not be empty");
-		}
-		if (ImGui::Button("Save", elemSize)) {
-			level_.saveBricks(bricks);			
-			if(temp != ""){
-				level_.writeToFile("assets/levels/" + temp + ".txt");
+			ImGui::SFML::Update(App, elapsed_);
+			ImGui::ShowDemoWindow();
+			ImGui::SetNextWindowPos({ PLAYAREA_X + PLAYAREA_WIDTH, 0 });
+			ImGui::SetNextWindowSize({ App.getSize().x - PLAYAREA_X - PLAYAREA_WIDTH + 0.f, App.getSize().y + 0.f });
+			ImGui::Begin("editor");
+			ImVec2 elemSize = { ImGui::GetWindowSize().x, 50 };
+			std::string temp = InputBuf;
+
+			ImGui::Text("PUTBRCK EDITOR");
+			ImGui::Text("Level name:");
+			ImGui::CaptureKeyboardFromApp(true);
+			ImGui::InputText("", InputBuf, 32);
+			if (temp == "") {
+				ImGui::TextColored({ 255,255,0,255 }, "Name can not be empty");
 			}
-		}
-		if (ImGui::Button("Load", elemSize)) {
-			level_.readFromFile("assets/levels/" + temp + ".txt");
-			level_.loadBricks(bricks);
-			for (auto &e : bricks) {
-				e.setTexture(tx["brick"]);
+			if (ImGui::Button("Save", elemSize)) {
+				level_.saveBricks(bricks);
+				if (temp != "") {
+					level_.writeToFile("assets/levels/" + temp + ".txt");
+				}
 			}
-		}
-		
+			if (ImGui::Button("Load", elemSize)) {
+				level_.readFromFile("assets/levels/" + temp + ".txt");
+				level_.loadBricks(bricks);
+				for (auto &e : bricks) {
+					e.setTexture(tx["brick"]);
+				}
+			}
 
-		if (ImGui::Selectable("Select", selected == 0)){ selected = 0; }
-		if (ImGui::Selectable("Add/remove bricks", selected == 1)) { selected = 1; }
-		if (ImGui::Selectable("Tool 2", selected == 2)) { selected = 2; }
-		if (ImGui::Selectable("Tool 3", selected == 3)) { selected = 3; }
 
-		ImGui::Columns(2);
-		if (ImGui::Button("Clear", { (elemSize.x) / 2, elemSize.y })) {			
-			ImGui::OpenPopup("Clear?");
-		}
+			if (ImGui::Selectable("Select", selected == 0)) { selected = 0; }
+			if (ImGui::Selectable("Add/remove bricks", selected == 1)) { selected = 1; }
+			if (ImGui::Selectable("Tool 2", selected == 2)) { selected = 2; }
+			if (ImGui::Selectable("Tool 3", selected == 3)) { selected = 3; }
+
+			ImGui::Columns(2);
+			if (ImGui::Button("Clear", { (elemSize.x) / 2, elemSize.y })) {
+				ImGui::OpenPopup("Clear?");
+			}
 			if (ImGui::BeginPopupModal("Clear?", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
 				focused = true;
 				ImGui::Text("Are you sure you want to clear all bricks?");
@@ -148,145 +150,140 @@ int editor::Run() {
 				}
 				ImGui::EndPopup();
 			}
-		
-		ImGui::NextColumn();
-		ImGui::Button("Fill", { (elemSize.x) / 2, elemSize.y });
-		ImGui::Columns(1);
+
+			ImGui::NextColumn();
+			ImGui::Button("Fill", { (elemSize.x) / 2, elemSize.y });
+			ImGui::Columns(1);
 
 
-
-
-
-		if (!focused) {
-			float mousePosX = sf::Mouse::getPosition(App).x;
-			float mousePosY = sf::Mouse::getPosition(App).y;
-			switch (selected) {
-			case 0:								
-				for (auto &e : bricks) {
-					float width2 = e.size().width / 2;
-					float height2 = e.size().height / 2;
-					float x1 = e.x() - width2;
-					float x2 = e.x() + width2;
-					float y1 = e.y() - height2;
-					float y2 = e.y() + height2;
-					if (mousePosX > x1 && mousePosX < x2 && mousePosY > y1 && mousePosY < y2) {
-						outline.setSize({ e.size().width, e.size().height });
-						outline.setOrigin( width2, height2 );
-						outline.setPosition(e.x(), e.y());
-						outline.setOutlineColor(sf::Color::Yellow);
-						//e.highlight(sf::Color::Blue, true);
-						if(sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
-							selectedBrick = &e;							
+			if (!focused) {
+				float mousePosX = sf::Mouse::getPosition(App).x;
+				float mousePosY = sf::Mouse::getPosition(App).y;
+				switch (selected) {
+				case 0:
+					for (auto &e : bricks) {
+						float width2 = e.size().width / 2;
+						float height2 = e.size().height / 2;
+						float x1 = e.x() - width2;
+						float x2 = e.x() + width2;
+						float y1 = e.y() - height2;
+						float y2 = e.y() + height2;
+						if (mousePosX > x1 && mousePosX < x2 && mousePosY > y1 && mousePosY < y2) {
+							outline.setSize({ e.size().width, e.size().height });
+							outline.setOrigin(width2, height2);
+							outline.setPosition(e.x(), e.y());
+							outline.setOutlineColor(sf::Color::Yellow);
+							//e.highlight(sf::Color::Blue, true);
+							if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
+								selectedBrick = &e;
+							}
+						} else {
+							//outline.setOutlineColor(sf::Color::Transparent);
+							//e.highlight(sf::Color::Blue, false);
 						}
-					}
-					else {
-						if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
+						if (sf::Mouse::isButtonPressed(sf::Mouse::Right)) {
 							selectedBrick = nullptr;
 						}
-						outline.setOutlineColor(sf::Color::Transparent);
-						//e.highlight(sf::Color::Blue, false);
 					}
-					ImGui::SetNextWindowBgAlpha(0.3f); // Transparent background
-					if (ImGui::Begin("Example: Simple Overlay", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav)) {
-						if (ImGui::IsMousePosValid()) {
-							ImGui::Text("Mouse Position: (%.1f,%.1f)", ImGui::GetIO().MousePos.x, ImGui::GetIO().MousePos.y);
-							ImGui::Text((mousePosX > x1) ? "YES" : "NO");
-							ImGui::Text((mousePosX < x2) ? "YES" : "NO");
-							ImGui::Text((mousePosX > y1) ? "YES" : "NO");
-							ImGui::Text( (mousePosX < y2) ? "YES" : "NO");
-						} else {
-							ImGui::Text("Mouse Position: <invalid>");
-						}
-					}
-					ImGui::End();
-				}				
-				break;
-			case 1:
-				if (taken) {
-					indicator.setFillColor(sf::Color(255, 255, 255, 100));
-				} else {
-					indicator.setFillColor(sf::Color(100, 255, 100, 200));
-				}
-				if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
-					for (auto &e : bricks) {
-						if (newBrickX == e.x() && newBrickY == e.y()) {
-							taken = true;
-						}
-					}
-					if (!taken) {
-						bricks.emplace_back(brick(tx["brick"], 1, 100, { newBrickX, newBrickY }));
-						std::cout << "New brick added at: " << newBrickX << ", " << newBrickY << std::endl;
-					}
-				}
-				if (sf::Mouse::isButtonPressed(sf::Mouse::Right)) {
-					for (auto &e : bricks) {
-						if (newBrickX == e.x() && newBrickY == e.y()) {
-							taken = true;
-						}
-					}
+					break;
+				case 1:
 					if (taken) {
-						bricks.emplace_back(brick(tx["brick"], 1, 100, { newBrickX, newBrickY }));
-						bricks.erase(
-							std::remove_if(bricks.begin(), bricks.end(),
-								[&](brick &o) { return newBrickX == o.x() && newBrickY == o.y(); }),
-							bricks.end());
-						std::cout << "Brick deleted at: " << newBrickX << ", " << newBrickY << std::endl;
+						indicator.setFillColor(sf::Color(255, 255, 255, 100));
+					} else {
+						indicator.setFillColor(sf::Color(100, 255, 100, 200));
 					}
+					if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
+						for (auto &e : bricks) {
+							if (newBrickX == e.x() && newBrickY == e.y()) {
+								taken = true;
+							}
+						}
+						if (!taken) {
+							bricks.emplace_back(brick(tx["brick"], 1, 100, { newBrickX, newBrickY }));
+							std::cout << "New brick added at: " << newBrickX << ", " << newBrickY << std::endl;
+						}
+					}
+					if (sf::Mouse::isButtonPressed(sf::Mouse::Right)) {
+						for (auto &e : bricks) {
+							float width2 = e.size().width / 2;
+							float height2 = e.size().height / 2;
+							float x1 = e.x() - width2;
+							float x2 = e.x() + width2;
+							float y1 = e.y() - height2;
+							float y2 = e.y() + height2;
+							if (mousePosX > x1 && mousePosX < x2 && mousePosY > y1 && mousePosY < y2) {
+							//if (newBrickX == e.x() && newBrickY == e.y()) {
+								taken = true;
+								bricks.erase(
+									std::remove_if(bricks.begin(), bricks.end(),
+										[&](brick &o) { return e.x() == o.x() && e.y() == o.y(); }),
+									bricks.end());
+								std::cout << "Brick deleted at: " << newBrickX << ", " << newBrickY << std::endl;
+
+							}
+						}
+						/*if (taken) {
+							//bricks.emplace_back(brick(tx["brick"], 1, 100, { newBrickX, newBrickY }));
+							bricks.erase(
+								std::remove_if(bricks.begin(), bricks.end(),
+									[&](brick &o) { return newBrickX == o.x() && newBrickY == o.y(); }),
+								bricks.end());
+							std::cout << "Brick deleted at: " << newBrickX << ", " << newBrickY << std::endl;
+						}*/
+					}
+					break;
+				default:
+					break;
 				}
-				break;
 			}
-		}
+			
+			//color = ref_color_v; 0;
 
-		ImGui::GetIO().FontGlobalScale = 2.5f;
-		if (ImGui::BeginMainMenuBar()) {
-			if (ImGui::BeginMenu("File")) {
+			ImGui::ColorPicker3("MyColor##4", (float*)&color, ImGuiColorEditFlags_PickerHueWheel);// , &ref_color_v.x);
 
-				ImGui::EndMenu();
+			if (selectedBrick) {
+			static ImVec4 ref_color_v = selectedBrick->sprite().getColor();			
+			if (ImGui::Button("Set color", elemSize)) {
+				selectedBrick->sprite().setColor(color);
 			}
-			if (ImGui::BeginMenu("Edit")) {
-				if (ImGui::MenuItem("Undo", "CTRL+Z")) {
-					std::cout << "UNDO CLICKED" << std::endl;
-				}
-				if (ImGui::MenuItem("Redo", "CTRL+Y", false, false)) {}  // Disabled item
-				ImGui::Separator();
-				if (ImGui::MenuItem("Cut", "CTRL+X")) {}
-				if (ImGui::MenuItem("Copy", "CTRL+C")) {}
-				if (ImGui::MenuItem("Paste", "CTRL+V")) {}
-				ImGui::EndMenu();
+			ImGui::Checkbox("Brush mode", &brushMode);
+			if (brushMode) {
+				selectedBrick->sprite().setColor(color);
 			}
-			ImGui::EndMainMenuBar();
-		}
-	
+			}
 
-		ImGui::End();
-		sp_background.setColor(sf::Color(255, 255, 255, 255));
+			ImGui::GetIO().FontGlobalScale = 2.5f;
 
-		//Clearing screen
-		App.clear();
-		//Drawing
-		App.draw(sp_background);
+			ImGui::End();
+			sp_background.setColor(sf::Color(255, 255, 255, 255));
 
-		for (auto &e : bricks) {
-			App.draw(e.sprite());
-		}	
+			//Clearing screen
+			App.clear();
+			//Drawing
+			App.draw(sp_background);
+
+			for (auto &e : bricks) {
+				App.draw(e.sprite());
+			}
+
+			if (selectedBrick != nullptr) {
+				outlineSelected.setSize({ selectedBrick->size().width, selectedBrick->size().height });
+				outlineSelected.setOrigin(selectedBrick->size().width / 2, selectedBrick->size().height / 2);
+				outlineSelected.setPosition(selectedBrick->x(), selectedBrick->y());
+
+				App.draw(outlineSelected);
+			}
+
+
+			App.draw(outline);
+			App.draw(indicator);
+			App.draw(debug);
+			App.draw(infoScore);
+			ImGui::SFML::Render(App);
+			App.display();
+			//App.setMouseCursorVisible(true);
+			//restartClock();
 		
-		if(selectedBrick != nullptr) {
-			outlineSelected.setSize({ selectedBrick->size().width, selectedBrick->size().height });
-			outlineSelected.setOrigin(selectedBrick->size().width / 2, selectedBrick->size().height / 2);
-			outlineSelected.setPosition(selectedBrick->x(), selectedBrick->y());
-
-			App.draw(outlineSelected);
-		}
-
-		
-		App.draw(outline);		
-		App.draw(indicator);
-		App.draw(debug);
-		App.draw(infoScore);
-		ImGui::SFML::Render(App);
-		App.display();
-		//App.setMouseCursorVisible(true);
-		//restartClock();
 	}
 
 	//Never reaching this point normally, but just in case, exit the application
