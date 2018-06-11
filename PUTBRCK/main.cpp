@@ -3,6 +3,7 @@
 #include "screens.h"
 #include "editor.h"
 #include <imgui-SFML.h>
+#include <imgui.h>
 
 
 int main(int argc, char** argv) {
@@ -14,7 +15,11 @@ int main(int argc, char** argv) {
 	sf::RenderWindow App(sf::VideoMode(1920, 1080, 32), "PUTBRCK", sf::Style::Titlebar | sf::Style::Close);
 	//App.setVerticalSyncEnabled(true);
 	App.setFramerateLimit(60);
-	//ImGui::SFML::Init(App);
+	
+	
+	
+	//ImGui::PushFont();
+
 	//Mouse cursor no more visible
 	App.setMouseCursorVisible(false);
 

@@ -1,5 +1,7 @@
 #include "game.h"
 #include <imgui.h>
+#include <imgui_internal.h>
+#include <imgui-SFML.h>
 
 game::game(sf::RenderWindow &App) : App(App) {
 	sf::Event Event;
@@ -107,10 +109,17 @@ game::game(sf::RenderWindow &App) : App(App) {
 	//}
 
 	//bonuses.emplace_back(bonus(App, tx["bonus"], { 0, 100 }, { 500.0f, 500.0f }));
+
+
 }
 
 int game::Run() {
 	sf::Event event;
+	ImGui::SFML::Init(App);
+	auto io = ImGui::GetIO();
+	io.Fonts->AddFontFromFileTTF("assets/fonts/Font Awesome 5 Free-Regular-400.otf", 16.f);
+	io.Fonts->AddFontFromFileTTF("assets/fonts/Sarpanch-Regular.ttf", 16.f);
+	ImGui::SFML::UpdateFontTexture();
 	while (running) {
 		//Verifying events
 		while (App.pollEvent(event)) {
@@ -139,10 +148,10 @@ int game::Run() {
 					break;
 
 				case sf::Keyboard::I:
-					//ImGui::ShowDemoWindow();
-					break;
+					ImGui::ShowDemoWindow();
+					break;			
 
-				
+
 				case sf::Keyboard::Num1:
 					music["bg1_A"].setVolume(100);
 					music["bg1_B"].setVolume(0);
@@ -286,7 +295,7 @@ int game::Run() {
 				if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
 					e.changeSpeed(0, 10);
 					//audio.play(0);
-					std::cout << e.getSpeed().x << std::endl;
+					std::cout << e.getSpeed().x << ", " << e.getSpeed().y << std::endl;
 				}
 				if (sf::Mouse::isButtonPressed(sf::Mouse::Right)) {
 					e.changeSpeed(0, -10);
@@ -312,8 +321,7 @@ int game::Run() {
 				if (!balls.empty()) {
 					App.draw(e.sprite());
 				}
-			}
-
+			}			
 			/*quad.draw(50);
 			quad.clear();
 
@@ -376,12 +384,12 @@ int game::Run() {
 
 
 			debug.setString(std::to_string((int)std::floor(1 / elapsed_.asSeconds())));
-			std::cout << elapsed_.asSeconds() << std::endl;
+			//std::cout << elapsed_.asSeconds() << std::endl;
 			App.draw(point);
 			App.draw(pad->sprite());
 			App.draw(debug);
 			App.draw(infoScore);
-			App.draw(point);
+			App.draw(point);			
 			App.display();
 
 			restartClock();

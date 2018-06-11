@@ -38,12 +38,14 @@ private:
 	std::vector<bonus> bonuses;
 
 	sf::RectangleShape indicator;
+	brick* selectedBrick;
 
 	level level_;
-
+	char InputBuf[256];
 
 	int score;
 	bool running;
+	bool focused;
 public:
 	editor(sf::RenderWindow &App, game* thisGame);
 	int Run() override;

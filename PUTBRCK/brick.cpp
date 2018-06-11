@@ -6,6 +6,7 @@ brick::brick(const sf::Texture& tx_brick, int health, int score, const sf::Vecto
 : entity(tx_brick ,position_), health(health), score(score) {
 	sprite_.setOrigin(size().width / 2, size().height / 2);
 	sprite_.setColor(sf::Color(255*randomInt(0,1), 255 * randomInt(0, 1), 255 * randomInt(0, 1)));
+	color_ = sprite_.getColor();
 }
 
 brick::~brick() {
@@ -27,4 +28,14 @@ bool brick::destroy() {
 
 int brick::points() {
 	return score;
+}
+
+void brick::highlight(sf::Color color, bool on) {
+	if(on) {
+		sprite().setColor(color);
+	}
+	else {
+		sprite().setColor(color_);
+	}
+
 }
