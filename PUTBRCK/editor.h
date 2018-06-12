@@ -46,6 +46,8 @@ private:
 	int score;
 	bool running;
 	bool focused;
+
+	bool mouseOverlap(entity& e);
 public:
 	editor(sf::RenderWindow &App, game* thisGame);
 	int Run() override;

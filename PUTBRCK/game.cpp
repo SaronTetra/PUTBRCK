@@ -22,7 +22,11 @@ game::game(sf::RenderWindow &App) : App(App) {
 	tx.loadTexture("assets/textures/ball.png", "ball");
 	tx.loadTexture("assets/textures/paddle.png", "paddle");
 	tx.loadTexture("assets/textures/brick.png", "brick");
-	tx.loadTexture("assets/textures/bonus.png", "bonus");
+	tx.loadTexture("assets/textures/powerBall.png", "powerBall");
+	tx.loadTexture("assets/textures/power_bonus.png", "bonusPower");
+	tx.loadTexture("assets/textures/faster_bonus.png", "bonusFaster");
+	tx.loadTexture("assets/textures/slower_bonus.png", "bonusSlower");
+	tx.loadTexture("assets/textures/ball_bonus.png", "bonusBall");
 
 	music["bg1_A"].openFromFile("assets/music/PM_ATG_2_100BPM_A.ogg");
 	music["bg1_B"].openFromFile("assets/music/PM_ATG_2_100BPM_B.ogg");
@@ -133,7 +137,7 @@ int game::Run() {
 				case sf::Keyboard::Escape:
 					return (-1);
 				case sf::Keyboard::Space:
-					bonuses.emplace_back(bonus(App, tx["bonus"], { 0, 100 }, { 500.0f, 500.0f }));
+					bonuses.emplace_back(bonus(App, tx["bonusPower"], { 0, 100 }, { 500.0f, 500.0f }));
 					break;
 				case sf::Keyboard::LBracket:
 					if (!balls.empty()) {
@@ -407,22 +411,30 @@ void game::restartClock() {
 	elapsed_ = clock_.restart();
 }
 
+
+//==========================================================================
+//BONUS
+//==========================================================================
 void game::applyBonus(bonusType bonus) {
 	switch (bonus) {
 	case bonusType::bonusBall:
 		balls.emplace_back(ball(App, tx["ball"], { 200, 200 }, { pad->sprite().getPosition().x, pad->sprite().getPosition().y }));
 		break;
-	case bonusType::biggerBall:
-
-		break;
-	case bonusType::smallerBall:
-
+	case bonusType::powerBall:
+		for (auto& e : balls) {
+			e.isPower = true;
+			e.setTexture(tx["powerBall"]);
+		}
 		break;
 	case bonusType::fasterBall:
-
+		for(auto& e:balls) {
+			e.setSpeed(e.getSpeed().x * 1.5f, e.getSpeed().y * 1.5f);
+		}
 		break;
 	case bonusType::slowerBall:
-
+		for (auto& e : balls) {
+			e.setSpeed(e.getSpeed().x * 0.5f, e.getSpeed().y * 0.5f);
+		}
 		break;
 	default:
 
@@ -431,6 +443,9 @@ void game::applyBonus(bonusType bonus) {
 	audio.play("bonus");
 }
 
+//==========================================================================
+//COLLISION
+//==========================================================================
 collision game::checkCollision(ball& ball, entity* object) {
 	auto ballX = ball.x();
 	auto ballY = ball.y();
@@ -450,8 +465,7 @@ collision game::checkCollision(ball& ball, entity* object) {
 	point.setPosition(objectX, objectY);
 	App.draw(point);*/
 	//if (sqrt(pow(objectX - ballX, 2) + pow(objectY - ballY, 2)) < ball.getLocalBounds().height / 2) {
-	if (pow(objectX - ballX, 2) + pow(objectY - ballY, 2) < pow(ball.r(), 2)) {
-		float rad = atan2(ballX - objectX, ballY - objectY);
+	if (pow(objectX - ballX, 2) + pow(objectY - ballY, 2) < pow(ball.r(), 2)) {		
 
 
 		//float offsetX = 0;// objectX - ballX + ball.r();
@@ -466,13 +480,16 @@ collision game::checkCollision(ball& ball, entity* object) {
 				score += object->points();
 			}
 		}
-
+		if (ball.isPower==true && object->type() != type::paddle) {
+			return collision::power;
+		}
 		//TODO: Get bonus type from object
 		if (ball.type() == type::bonus) {
 			object->destroy();
-			applyBonus(bonusType::bonusBall);
+			applyBonus(bonusType::powerBall);
 		}
 
+		float rad = atan2(ballX - objectX, ballY - objectY);
 		if (rad > -3 * M_PI / 4 && rad > 3 * M_PI / 4) {
 			ball.move(objectX, objectY - ball.r());
 			return collision::up;

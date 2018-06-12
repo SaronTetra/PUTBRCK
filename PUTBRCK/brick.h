@@ -7,7 +7,7 @@ class brick : public entity{
 private:
 	int health;
 	int score;
-	//sf::bonus bonus;
+	bonusType bonus_;
 	sf::Color color_;
 
 public:
@@ -21,6 +21,11 @@ public:
 	
 	bool destroy() override;
 	int points() override;
+	bonusType bonus() override;
 	void highlight(sf::Color color, bool on);
+	void setHealth(int h) { health = h; }
+	void setPoints(int s) { score = s; }
+	int getHealth() { return health; }
+	void setBonus(bonusType newBonus) { bonus_ = newBonus; }
 	//TODO: Glow on hit (render twice);
 };

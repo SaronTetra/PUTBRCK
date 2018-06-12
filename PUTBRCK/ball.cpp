@@ -13,6 +13,7 @@ ball::ball(sf::RenderWindow &App, sf::Texture& tx_ball, sf::Vector2i speed_, sf:
 	//std::cout << sp_ball.getOrigin().x << ", " << sp_ball.getOrigin().x << std::endl;
 	//entityID++;
 	toDelete = false;
+	isPower = false;
 }
 
 ball::~ball() {

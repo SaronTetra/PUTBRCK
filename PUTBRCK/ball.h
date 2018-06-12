@@ -68,4 +68,5 @@ public:
 	sf::Vector2i getSpeed();
 
 	bool toDelete;
+	bool isPower;
 };

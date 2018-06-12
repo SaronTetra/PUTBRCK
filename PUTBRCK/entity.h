@@ -4,9 +4,9 @@
 
 float clamp(float x, float a, float b);
 
-enum class collision { none, left, right, up, down };
+enum class collision { none, left, right, up, down, power};
 enum class type { entity, ball, paddle, brick, bonus };
-enum class bonusType{ bonusBall, fasterBall, slowerBall, biggerBall, smallerBall};
+enum class bonusType{ none, bonusBall, fasterBall, slowerBall, powerBall};
 
 class entity {
 protected:
@@ -25,6 +25,7 @@ public:
 	}
 	virtual bool destroy();
 	virtual int points();
+	virtual bonusType bonus() { return bonusType::none; };
 	
 	auto x() { return sprite_.getPosition().x; }
 	auto y() { return sprite_.getPosition().y; }
@@ -33,6 +34,11 @@ public:
 
 	auto size() { return sprite_.getLocalBounds(); }
 
-	//int id() { return entityID; }
+
+	auto x1() { return sprite_.getPosition().x - size().width/2; }
+	auto x2() { return sprite_.getPosition().x + size().width / 2; }
+
+	auto y1() { return sprite_.getPosition().y - size().height/2; }
+	auto y2() { return sprite_.getPosition().y + size().height / 2; }
 	bool toDelete = false;
 };
