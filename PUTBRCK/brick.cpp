@@ -31,7 +31,7 @@ int brick::points() {
 	return score;
 }
 
-bonusType brick::bonus() {
+bonusType brick::bonusInside() {
 	return bonus_;
 }
 

@@ -1,13 +1,13 @@
 #include "bonus.h"
 #include "myrandom.h"
 
-bonus::bonus(sf::RenderWindow & App, sf::Texture & tx_bonus, sf::Vector2i speed_, sf::Vector2f position_) 
+bonus::bonus(sf::RenderWindow & App, sf::Texture & tx_bonus, bonusType type, sf::Vector2i speed_, sf::Vector2f position_) 
 : ball(App, tx_bonus, speed_, position_){
 	radius = tx_bonus.getSize().x / 2;
 	sprite_.setOrigin(radius, radius);
 	speed = speed_;
 	//std::cout << sp_ball.getOrigin().x << ", " << sp_ball.getOrigin().x << std::endl;
-	bonusType_ = bonusType(randomInt(0, 5));
+	bonusType_ = type;// bonusType(randomInt(0, 5));
 }
 
 bonus::~bonus() {

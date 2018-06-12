@@ -25,7 +25,7 @@ public:
 	}
 	virtual bool destroy();
 	virtual int points();
-	virtual bonusType bonus() { return bonusType::none; };
+	virtual bonusType bonusInside() { return bonusType::none; };
 	
 	auto x() { return sprite_.getPosition().x; }
 	auto y() { return sprite_.getPosition().y; }

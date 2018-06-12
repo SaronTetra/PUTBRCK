@@ -21,7 +21,7 @@ public:
 	
 	bool destroy() override;
 	int points() override;
-	bonusType bonus() override;
+	bonusType bonusInside() override;
 	void highlight(sf::Color color, bool on);
 	void setHealth(int h) { health = h; }
 	void setPoints(int s) { score = s; }

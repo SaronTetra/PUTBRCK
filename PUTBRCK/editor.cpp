@@ -429,7 +429,7 @@ int editor::Run() {
 			bonusText.setOutlineColor(sf::Color::Black);
 			bonusText.setOutlineThickness(1);
 			std::string temp;
-			switch(e.bonus()) {
+			switch(e.bonusInside()) {
 			case bonusType::bonusBall:
 				temp = "BB";
 				break;

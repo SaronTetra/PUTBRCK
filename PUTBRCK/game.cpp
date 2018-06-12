@@ -137,7 +137,7 @@ int game::Run() {
 				case sf::Keyboard::Escape:
 					return (-1);
 				case sf::Keyboard::Space:
-					bonuses.emplace_back(bonus(App, tx["bonusPower"], { 0, 100 }, { 500.0f, 500.0f }));
+					bonuses.emplace_back(bonus(App, tx["bonusSlower"], bonusType::slowerBall, { 0, 100 }, { 500.0f, 500.0f }));
 					break;
 				case sf::Keyboard::LBracket:
 					if (!balls.empty()) {
@@ -476,8 +476,28 @@ collision game::checkCollision(ball& ball, entity* object) {
 		//TODO: Calculate collision offset/distance
 
 		if (object->type() == type::brick) {
+			auto tempX = object->x();
+			auto tempY = object->y();
 			if (object->destroy()) {
 				score += object->points();
+				switch (object->bonusInside()) {
+				case bonusType::bonusBall:
+					bonuses.emplace_back(bonus(App, tx["bonusBall"], object->bonusInside(), { 0, 200 }, { tempX,tempY }));
+					break;
+				case bonusType::fasterBall:
+					bonuses.emplace_back(bonus(App, tx["bonusFaster"], object->bonusInside(), { 0, 200 }, { tempX, tempY }));
+					break;
+				case bonusType::powerBall:
+					bonuses.emplace_back(bonus(App, tx["bonusPower"], object->bonusInside(), { 0, 200 }, { tempX, tempY }));
+					break;
+				case bonusType::slowerBall:
+					bonuses.emplace_back(bonus(App, tx["bonusSlower"], object->bonusInside(), { 0, 200 }, { tempX,tempY }));
+					break;
+				case bonusType::none:
+					break;
+				default:
+					break;
+				}
 			}
 		}
 		if (ball.isPower==true && object->type() != type::paddle) {
@@ -485,8 +505,8 @@ collision game::checkCollision(ball& ball, entity* object) {
 		}
 		//TODO: Get bonus type from object
 		if (ball.type() == type::bonus) {
+			applyBonus(ball.bonusInside());
 			object->destroy();
-			applyBonus(bonusType::powerBall);
 		}
 
 		float rad = atan2(ballX - objectX, ballY - objectY);
