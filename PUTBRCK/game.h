@@ -27,9 +27,9 @@ private:
 	sf::RenderWindow &App;
 
 	//std::map<std::string, sf::Texture> tx; //sprites are pointers to textures, texture must not be destroyed
-	std::map<std::string, sf::SoundBuffer> sfxBuffer; //similar to texture/sprite combo
-	std::map<std::string, sf::Sound> sfx; //similar to texture/sprite combo
-	std::map<std::string, sf::Music> music;  //plays directyl from a file, no buffer
+	//std::map<std::string, sf::SoundBuffer> sfxBuffer; //similar to texture/sprite combo
+	//std::map<std::string, sf::Sound> sfx; //similar to texture/sprite combo
+	//std::map<std::string, sf::Music> music;  //plays directyl from a file, no buffer
 	sf::Sprite sp_background;
 	sf::Font font;
 	sf::Text debug;

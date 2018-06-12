@@ -71,9 +71,9 @@ private:
 	std::map<std::string, sf::Texture> texture; 
 public:
 	void loadTexture(std::string src, std::string name); // file path, map name
-	TextureContainer() {
-		//sounds.resize(MAX_SOUNDS);
-	}
+	TextureContainer() {}
+
+	void init();
 
 	//friend auto operator[](std::string name, const TextureContainer& TC);
 	sf::Texture& operator[](std::string name);
@@ -82,6 +82,7 @@ public:
 
 extern AudioContainer audio;
 extern TextureContainer tx;
+extern std::map<std::string, sf::Music> music;  //plays directyl from a file, no buffer
 
 //TODO: Music manager
 //TODO: Texture manager

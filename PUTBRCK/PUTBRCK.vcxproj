@@ -138,6 +138,7 @@
     <ClCompile Include="ball.cpp" />
     <ClCompile Include="bonus.cpp" />
     <ClCompile Include="brick.cpp" />
+    <ClCompile Include="credits.cpp" />
     <ClCompile Include="editor.cpp" />
     <ClCompile Include="entity.cpp" />
     <ClCompile Include="game.cpp" />
@@ -156,6 +157,7 @@
     <ClInclude Include="ball.h" />
     <ClInclude Include="bonus.h" />
     <ClInclude Include="brick.h" />
+    <ClInclude Include="credits.h" />
     <ClInclude Include="cScreen.h" />
     <ClInclude Include="editor.h" />
     <ClInclude Include="entity.h" />

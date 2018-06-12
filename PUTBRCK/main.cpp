@@ -4,6 +4,7 @@
 #include "editor.h"
 #include <imgui-SFML.h>
 #include <imgui.h>
+#include "credits.h"
 
 
 int main(int argc, char** argv) {
@@ -15,13 +16,10 @@ int main(int argc, char** argv) {
 	sf::RenderWindow App(sf::VideoMode(1920, 1080, 32), "PUTBRCK", sf::Style::Titlebar | sf::Style::Close);
 	//App.setVerticalSyncEnabled(true);
 	App.setFramerateLimit(60);
-	
-	
-	
-	//ImGui::PushFont();
 
 	//Mouse cursor no more visible
 	App.setMouseCursorVisible(false);
+	tx.init();
 
 	//Screens preparations
 	game game(App);
@@ -29,6 +27,9 @@ int main(int argc, char** argv) {
 
 	editor editor(App, &game);
 	Screens.push_back(&editor);
+
+	credits credits(App, &game);
+	Screens.push_back(&credits);
 
 
 	screen = 0;
