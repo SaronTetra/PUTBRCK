@@ -55,6 +55,9 @@ private:
 	int currentBullet;
 	int currentPoint;
 	int cannon;
+	bool cannonFire;
+	float laserScale;
+	bool laserPlayed;
 
 	int score;
 	bool running;

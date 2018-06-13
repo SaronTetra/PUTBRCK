@@ -49,6 +49,7 @@ void TextureContainer::init() {
 		tx.loadTexture("assets/textures/slower_bonus.png", "bonusSlower");
 		tx.loadTexture("assets/textures/ball_bonus.png", "bonusBall");
 		tx.loadTexture("assets/textures/point.png", "point");
+		tx.loadTexture("assets/textures/laser.png", "laser");
 
 		music["bg1_A"].openFromFile("assets/music/PM_ATG_2_100BPM_A.ogg");
 		music["bg1_B"].openFromFile("assets/music/PM_ATG_2_100BPM_B.ogg");
@@ -86,6 +87,7 @@ void TextureContainer::init() {
 		audio.loadAudio("assets/sfx/PM_CSPH_Cursor_2_short.ogg", "click1");
 		audio.loadAudio("assets/sfx/PM_FN_Objects_Items_Interactions_Menus_40_short.ogg", "click2");
 		audio.loadAudio("assets/sfx/PM_CS_cursor_terminal_short.ogg", "point");
+		audio.loadAudio("assets/sfx/PM_SA_CINEMATIC_IMPACT_16.ogg", "laser");
 	}
 }
 

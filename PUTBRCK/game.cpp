@@ -48,6 +48,7 @@ game::game(sf::RenderWindow &App) : App(App) {
 		temp.readFromFile("assets/levels/official/c3.txt"); levels.push_back(temp);
 		temp.readFromFile("assets/levels/official/c4.txt"); levels.push_back(temp);
 		temp.readFromFile("assets/levels/official/c5.txt"); levels.push_back(temp);
+		temp.readFromFile("assets/levels/official/c6.txt"); levels.push_back(temp);
 		
 	
 
@@ -74,27 +75,21 @@ game::game(sf::RenderWindow &App) : App(App) {
 	balls.emplace_back(ball(App, tx["ball"], { 300, 300 }, { pad->x(), pad->y() + 10 }));
 	balls.back().moving = false;
 
-	for (int i = 0; i < 5; ++i) {
-		bullets.emplace_back(ball(App, tx["ball"], { 0, 0 },{-100, -100}));
-		bullets.back().sprite().setColor(sf::Color::Red);
-		bullets.back().sprite().setScale({ 2,2 });
-	}
-	currentBullet = 0;
-
-
 	for (int i = 0; i < 25; ++i) {
 		points.emplace_back(ball(App, tx["point"], { 0, 0 }, { -100, -100 }));
 		points.back().sprite().setColor(sf::Color(0,255,255));
 	}
 	currentPoint = 0;
 	cannon = 0;
+	cannonFire = true;
+	bool laserPlayed = false;
 }
 
 //==========================================================================
 //NEXT LEVEL
 //==========================================================================
 void game::nextLevel() {
-	if (currentLevel > levels.size()) {
+	if (currentLevel >= levels.size() - 1) {
 		return;
 	}
 	++currentLevel;
@@ -106,6 +101,7 @@ void game::nextLevel() {
 	balls.emplace_back(ball(App, tx["ball"], { 300, 300 }, { pad->x(), pad->y() + 10 }));
 	balls.back().moving = false;	
 	paused = false;	
+	laserScale = 1;
 	
 }
 
@@ -118,7 +114,7 @@ int game::Run() {
 	ImGui::SFML::UpdateFontTexture();
 	info.setString("Press Space to start");
 	while (running) {		
-		if (currentLevel >= levels.size()) {
+		if (currentLevel >= levels.size() - 1) {
 			return 2;
 		}
 		//Verifying events
@@ -236,44 +232,55 @@ int game::Run() {
 			//Drawing
 			App.draw(sp_background);
 
-			//sf::CircleShape point(6);
-			//point.setFillColor(sf::Color::Red);
-			//point.setPosition(pad->sprite().getPosition());
-
-
 			for (auto &e : balls) {
 				e.move(elapsed_);
 				if(e.moving == false) {
 					e.move( pad->x(), pad->y() - (2*e.r()+  5) );
+				}		
+			}
+			
+			if (sf::Mouse::isButtonPressed(sf::Mouse::Left) && cannon > 10 && 
+				cooldownClock.getElapsedTime() > sf::milliseconds(1000) && 
+				!cannonFire) {
+				
+				laserScale = 1;
+				cannon -= 10;
+				cooldownClock.restart();
+				cannonFire = true;
+				laserPlayed = false;
+			}
+			if(cannonFire) {
+				sf::RectangleShape temp;
+				temp.setFillColor(sf::Color::Red);
+				sf::Sprite laser;
+				laser.setTexture(tx["laser"]);
+				laser.setOrigin({ laser.getLocalBounds().width / 2, 0 });
+			
+				auto time = cooldownClock.getElapsedTime().asMilliseconds();
+				if(time < 1000) {
+					temp.setPosition(pad->x(), PLAYAREA_Y);
+					temp.setSize({ 1, laser.getLocalBounds().height });
+					App.draw(temp);
 				}
-				/*if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
-					e.changeSpeed(0, 10);
-					//audio.play(0);
-					std::cout << e.getSpeed().x << ", " << e.getSpeed().y << std::endl;
-				}
-				if (sf::Mouse::isButtonPressed(sf::Mouse::Right)) {
-					e.changeSpeed(0, -10);
-					std::cout << e.getSpeed().x << std::endl;
-				}*/
-
-				if (sf::Mouse::isButtonPressed(sf::Mouse::Left) && cannon > 10 && cooldownClock.getElapsedTime() > sf::milliseconds(5)) {
-					/*bullets[currentBullet].setSpeed(0, -1000);
-					bullets[currentBullet].move( pad->x(), pad->y() - (e.r() * 2 + 20) );
-					
-					currentBullet++;
-					if(currentBullet >= 5) {
-						currentBullet = 0;
-					}*/
-					for (auto &e : bullets) {
-						e.setSpeed(0, -1000);
-						e.move(pad->x(), pad->y() - (e.r() * 2 + 20) - 25 * currentBullet);
-						currentBullet++;
-						if (currentBullet >= bullets.size()) {
-							currentBullet = 0;
+				else if(time < 2000 && laserScale > 0) {
+					if (!laserPlayed) {
+						for (auto& e : bricks) {
+							if (e.x1() < pad->x() + laser.getLocalBounds().width/2 && e.x2() > pad->x()-laser.getLocalBounds().width / 2) {
+								e.toDelete = true;
+							}
 						}
-					}
-					cooldownClock.restart();
-					cannon -= 10;
+						audio.play("laser");
+						laserPlayed = true;
+					}				
+					laser.setPosition(pad->x(), PLAYAREA_Y);
+					laser.setScale({ laserScale, 0.9f });	
+					laser.setColor(sf::Color(255-laserScale*1, 255 - laserScale * 1, 0));
+					laserScale -= 0.05;
+					std::cout << laser.getScale().x << std::endl;
+					App.draw(laser);							
+				}
+				else {					
+					cannonFire = false;					
 				}
 			}
 			pad->move();
@@ -298,20 +305,6 @@ int game::Run() {
 			}		
 
 
-			for (auto &e : bullets) {
-				e.move(elapsed_);
-				if (e.y() < PLAYAREA_Y) {
-					e.move(-100, -100);
-					e.setSpeed(0, 0);
-				}
-			}
-
-			for (auto &e : bullets) {
-				if (!bullets.empty()) {
-					App.draw(e.sprite());
-				}
-			}
-
 			for (auto &e : points) {
 				e.move(elapsed_);
 				if (e.y() > PLAYAREA_Y + PLAYAREA_HEIGHT) {
@@ -328,41 +321,8 @@ int game::Run() {
 				}
 				App.draw(e.sprite());
 			}
-			for (auto &e : points) {
-				if (!points.empty()) {
-					//e.move(pad->x(), pad->y());
-				}
-			}
 			
-			/*quad.draw(50);
-			quad.clear();
-
-			for (auto& e : bricks) {
-			quad.insert(&e);
-			}
-
-			for (auto& e : balls) {
-			//quad.insert(&e);
-			}
-
-			for (auto &e : balls) {
-			returnObjects.clear();
-			quad.retrive(returnObjects, e);
-			for (auto &f : returnObjects) {
-			collision direction = checkCollision(e, f);
-			e.bounce(direction);
-			infoScore.setString("Score: " + std::to_string(score));
-			point.setPosition(e.sprite().getPosition());
-			App.draw(f->sprite());
-			}
-			App.draw(e.sprite());
-
-			}
-			for (auto &e : bricks) {
-				App.draw(e.sprite());
-			}
-
-			*/
+	
 
 			for (auto &e : bricks) {
 				for (auto &f : balls) {
