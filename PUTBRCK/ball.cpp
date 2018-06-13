@@ -37,7 +37,7 @@ void ball::offset(float x, float y) {
 	sprite_.setPosition(pos.x + x, pos.y + y);
 }
 
-bool ball::checkCollision() {
+bool ball::checkCollision() {	
 	//right
 	if (x() > PLAYAREA_X + PLAYAREA_WIDTH - radius && speed.x > 0) {
 		speed.x = -speed.x;
@@ -55,7 +55,9 @@ bool ball::checkCollision() {
 	if (y() > PLAYAREA_Y + PLAYAREA_HEIGHT - radius && speed.y > 0){
 		speed.y = -speed.y;
 		this->move(x(), PLAYAREA_HEIGHT + PLAYAREA_Y - radius);
-		audio.play("ballLost");		
+		if (type() == type::ball) {
+			audio.play("ballLost");
+		}
 		toDelete = true;
 		return true;
 	}

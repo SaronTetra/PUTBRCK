@@ -5,6 +5,7 @@
 #include <imgui-SFML.h>
 #include <imgui.h>
 #include "credits.h"
+#include "menu.h"
 
 
 int main(int argc, char** argv) {
@@ -22,8 +23,9 @@ int main(int argc, char** argv) {
 	tx.init();
 
 	//Screens preparations
+
 	game game(App);
-	Screens.push_back(&game);
+	Screens.push_back(&game);	
 
 	editor editor(App, &game);
 	Screens.push_back(&editor);
@@ -31,8 +33,11 @@ int main(int argc, char** argv) {
 	credits credits(App, &game);
 	Screens.push_back(&credits);
 
+	menu menu(App, &game);
+	Screens.push_back(&menu);
 
-	screen = 0;
+
+	screen = 3;
 	//Main loop
 	try {
 		while (screen >= 0) {

@@ -19,6 +19,8 @@ void bonus::bounce(collision direction) {
 	}
 }
 
+
+
 bool bonus::destroy() {
 	//TODO: Proper destruction
 	move(-100, -100);

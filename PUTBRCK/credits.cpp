@@ -23,8 +23,8 @@ credits::credits(sf::RenderWindow & App, game* thisGame) : App(App), thisGame(th
 	sp_logo.setPosition( App.getSize().x/2, App.getSize().y/2);
 	running = true;
 
-	if (!font_.loadFromFile("assets/fonts/DEJAVUSANSMONO.ttf")) {
-		std::cerr << "Error loading DEJAVUSANSMONO.ttf" << std::endl;
+	if (!font_.loadFromFile("assets/fonts/Sarpanch-Regular.ttf")) {
+		std::cerr << "Error loading Sarpanch-Regular.ttf" << std::endl;
 		throw - 1;
 	}
 
@@ -45,7 +45,22 @@ credits::credits(sf::RenderWindow & App, game* thisGame) : App(App), thisGame(th
 
 int credits::Run() {
 	sf::Event event;
+
+	sp_logo.setPosition(App.getSize().x / 2, App.getSize().y / 2);
+	sf::Vector2f lastPos = { sp_logo.getPosition().x, sp_logo.getPosition().y + 1024 };
+	for (auto& e : text_) {
+		e.setPosition(App.getSize().x / 2, lastPos.y + 128);
+		lastPos = e.getPosition();
+	}
+
+	for(auto &e:music) {	
+		e.second.setVolume(0);
+	}
+
 	music["credits"].play();
+	music["credits"].setVolume(100);
+	clock_.restart();
+
 	//==========================================================================
 	//VARIABLES
 	//==========================================================================
@@ -68,7 +83,8 @@ int credits::Run() {
 			if (event.type == sf::Event::KeyPressed) {
 				switch (event.key.code) {
 				case sf::Keyboard::Escape:
-					return (-1);
+					music["credits"].stop();
+					return (3);
 				case sf::Keyboard::Home:
 					thisGame->resume();
 					return 0;

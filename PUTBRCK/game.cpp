@@ -2,6 +2,7 @@
 #include <imgui.h>
 #include <imgui_internal.h>
 #include <imgui-SFML.h>
+#include "myrandom.h"
 
 game::game(sf::RenderWindow &App) : App(App) {
 	sf::Event Event;
@@ -11,17 +12,16 @@ game::game(sf::RenderWindow &App) : App(App) {
 
 
 
-	debug.setFont(font);
-	debug.setCharacterSize(96);
-	debug.setPosition({ 100, 100 });
+	info.setFont(font);
+	info.setCharacterSize(128);
+	info.setOutlineColor(sf::Color::Black);
+	info.setOutlineThickness(2);
+	info.setOrigin(info.getLocalBounds().width / 2, info.getLocalBounds().height / 2);
+	info.setPosition(App.getSize().x / 2, App.getSize().y/2);
 
 	infoScore.setFont(font);
 	infoScore.setCharacterSize(48);
 	infoScore.setPosition({ 10, 10 });
-
-
-	point.setRadius(1);
-	point.setFillColor(sf::Color::Red);
 
 	sp_background.setTexture(tx["background"]);
 	sp_background.setColor(sf::Color(255, 255, 255, 255));
@@ -40,8 +40,19 @@ game::game(sf::RenderWindow &App) : App(App) {
 		}
 	}*/
 
-		level_.readFromFile("assets/levels/spiral.txt");
-		level_.loadBricks(bricks);
+		currentLevel = 0;
+		level temp;
+		temp.readFromFile("assets/levels/official/c0.txt"); levels.push_back(temp);
+		temp.readFromFile("assets/levels/official/c1.txt"); levels.push_back(temp);
+		temp.readFromFile("assets/levels/official/c2.txt"); levels.push_back(temp);
+		temp.readFromFile("assets/levels/official/c3.txt"); levels.push_back(temp);
+		temp.readFromFile("assets/levels/official/c4.txt"); levels.push_back(temp);
+		temp.readFromFile("assets/levels/official/c5.txt"); levels.push_back(temp);
+		
+	
+
+		//level_.readFromFile("assets/levels/spiral.txt");
+		levels[currentLevel].loadBricks(bricks);
 		for (auto &e : bricks) {
 			e.setTexture(tx["brick"]);
 		}
@@ -60,7 +71,42 @@ game::game(sf::RenderWindow &App) : App(App) {
 
 	//bonuses.emplace_back(bonus(App, tx["bonus"], { 0, 100 }, { 500.0f, 500.0f }));
 
+	balls.emplace_back(ball(App, tx["ball"], { 300, 300 }, { pad->x(), pad->y() + 10 }));
+	balls.back().moving = false;
 
+	for (int i = 0; i < 5; ++i) {
+		bullets.emplace_back(ball(App, tx["ball"], { 0, 0 },{-100, -100}));
+		bullets.back().sprite().setColor(sf::Color::Red);
+		bullets.back().sprite().setScale({ 2,2 });
+	}
+	currentBullet = 0;
+
+
+	for (int i = 0; i < 25; ++i) {
+		points.emplace_back(ball(App, tx["point"], { 0, 0 }, { -100, -100 }));
+		points.back().sprite().setColor(sf::Color(0,255,255));
+	}
+	currentPoint = 0;
+	cannon = 0;
+}
+
+//==========================================================================
+//NEXT LEVEL
+//==========================================================================
+void game::nextLevel() {
+	if (currentLevel > levels.size()) {
+		return;
+	}
+	++currentLevel;
+	levels[currentLevel].loadBricks(bricks);
+	for (auto &e : bricks) {
+		e.setTexture(tx["brick"]);
+	}
+	balls.clear();
+	balls.emplace_back(ball(App, tx["ball"], { 300, 300 }, { pad->x(), pad->y() + 10 }));
+	balls.back().moving = false;	
+	paused = false;	
+	
 }
 
 int game::Run() {
@@ -70,7 +116,11 @@ int game::Run() {
 	io.Fonts->AddFontFromFileTTF("assets/fonts/Font Awesome 5 Free-Regular-400.otf", 16.f);
 	io.Fonts->AddFontFromFileTTF("assets/fonts/Sarpanch-Regular.ttf", 16.f);
 	ImGui::SFML::UpdateFontTexture();
-	while (running) {
+	info.setString("Press Space to start");
+	while (running) {		
+		if (currentLevel >= levels.size()) {
+			return 2;
+		}
 		//Verifying events
 		while (App.pollEvent(event)) {
 			// Window closed
@@ -81,9 +131,14 @@ int game::Run() {
 			if (event.type == sf::Event::KeyPressed) {
 				switch (event.key.code) {
 				case sf::Keyboard::Escape:
-					return (-1);
+					paused = true;
+					return (3);
 				case sf::Keyboard::Space:
-					bonuses.emplace_back(bonus(App, tx["bonusSlower"], bonusType::slowerBall, { 0, 100 }, { 500.0f, 500.0f }));
+					//bonuses.emplace_back(bonus(App, tx["bonusSlower"], bonusType::slowerBall, { 0, 100 }, { 500.0f, 500.0f }));
+					for(auto &e:balls) {
+						e.moving = true;
+					}
+					info.setString("");
 					break;
 				case sf::Keyboard::LBracket:
 					if (!balls.empty()) {
@@ -92,63 +147,6 @@ int game::Run() {
 					break;
 				case sf::Keyboard::RBracket:
 					balls.emplace_back(ball(App, tx["ball"], { 500, 500 }, { 400.0f, 500.0f }));
-					break;
-				case sf::Keyboard::Q:
-					audio.play("hit2");
-					break;
-
-				case sf::Keyboard::I:
-					ImGui::ShowDemoWindow();
-					break;			
-
-
-				case sf::Keyboard::Num1:
-					music["bg1_A"].setVolume(100);
-					music["bg1_B"].setVolume(0);
-					music["bg1_C"].setVolume(0);
-					music["bg1_D"].setVolume(0);
-					music["bg1_E"].setVolume(0);
-					music["bg1_F"].setVolume(0);
-					break;
-				case sf::Keyboard::Num2:
-					music["bg1_A"].setVolume(0);
-					music["bg1_B"].setVolume(100);
-					music["bg1_C"].setVolume(0);
-					music["bg1_D"].setVolume(0);
-					music["bg1_E"].setVolume(0);
-					music["bg1_F"].setVolume(0);
-					break;
-				case sf::Keyboard::Num3:
-					music["bg1_A"].setVolume(0);
-					music["bg1_B"].setVolume(0);
-					music["bg1_C"].setVolume(100);
-					music["bg1_D"].setVolume(0);
-					music["bg1_E"].setVolume(0);
-					music["bg1_F"].setVolume(0);
-					break;
-				case sf::Keyboard::Num4:
-					music["bg1_A"].setVolume(0);
-					music["bg1_B"].setVolume(0);
-					music["bg1_C"].setVolume(0);
-					music["bg1_D"].setVolume(100);
-					music["bg1_E"].setVolume(0);
-					music["bg1_F"].setVolume(0);
-					break;
-				case sf::Keyboard::Num5:
-					music["bg1_A"].setVolume(0);
-					music["bg1_B"].setVolume(0);
-					music["bg1_C"].setVolume(0);
-					music["bg1_D"].setVolume(0);
-					music["bg1_E"].setVolume(100);
-					music["bg1_F"].setVolume(0);
-					break;
-				case sf::Keyboard::Num6:
-					music["bg1_A"].setVolume(0);
-					music["bg1_B"].setVolume(0);
-					music["bg1_C"].setVolume(0);
-					music["bg1_D"].setVolume(0);
-					music["bg1_E"].setVolume(0);
-					music["bg1_F"].setVolume(100);
 					break;
 				case sf::Keyboard::End:
 					pause();
@@ -162,9 +160,8 @@ int game::Run() {
 					paused ? resume() : pause();
 					//pause();
 					break;
-				case sf::Keyboard::Return:
-					pause();
-					sf::sleep(sf::milliseconds(16));
+				case sf::Keyboard::U:
+					nextLevel();
 					resume();
 				default:
 					break;
@@ -172,8 +169,8 @@ int game::Run() {
 			}
 		}
 		if (!paused) {
-			switch (score) {
-			case 100:
+			switch (currentLevel) {
+			case 0:
 				music["bg1_A"].setVolume(100);
 				music["bg1_B"].setVolume(0);
 				music["bg1_C"].setVolume(0);
@@ -181,7 +178,7 @@ int game::Run() {
 				music["bg1_E"].setVolume(0);
 				music["bg1_F"].setVolume(0);
 				break;
-			case 1000:
+			case 1:
 				music["bg1_A"].setVolume(0);
 				music["bg1_B"].setVolume(100);
 				music["bg1_C"].setVolume(0);
@@ -189,7 +186,7 @@ int game::Run() {
 				music["bg1_E"].setVolume(0);
 				music["bg1_F"].setVolume(0);
 				break;
-			case 2000:
+			case 2:
 				music["bg1_A"].setVolume(0);
 				music["bg1_B"].setVolume(0);
 				music["bg1_C"].setVolume(100);
@@ -197,7 +194,7 @@ int game::Run() {
 				music["bg1_E"].setVolume(0);
 				music["bg1_F"].setVolume(0);
 				break;
-			case 3000:
+			case 3:
 				music["bg1_A"].setVolume(0);
 				music["bg1_B"].setVolume(0);
 				music["bg1_C"].setVolume(0);
@@ -205,7 +202,7 @@ int game::Run() {
 				music["bg1_E"].setVolume(0);
 				music["bg1_F"].setVolume(0);
 				break;
-			case 4000:
+			case 4:
 				music["bg1_A"].setVolume(0);
 				music["bg1_B"].setVolume(0);
 				music["bg1_C"].setVolume(0);
@@ -213,7 +210,7 @@ int game::Run() {
 				music["bg1_E"].setVolume(100);
 				music["bg1_F"].setVolume(0);
 				break;
-			case 5000:
+			case 5:
 				music["bg1_A"].setVolume(0);
 				music["bg1_B"].setVolume(0);
 				music["bg1_C"].setVolume(0);
@@ -246,7 +243,10 @@ int game::Run() {
 
 			for (auto &e : balls) {
 				e.move(elapsed_);
-				if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
+				if(e.moving == false) {
+					e.move( pad->x(), pad->y() - (2*e.r()+  5) );
+				}
+				/*if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
 					e.changeSpeed(0, 10);
 					//audio.play(0);
 					std::cout << e.getSpeed().x << ", " << e.getSpeed().y << std::endl;
@@ -254,6 +254,26 @@ int game::Run() {
 				if (sf::Mouse::isButtonPressed(sf::Mouse::Right)) {
 					e.changeSpeed(0, -10);
 					std::cout << e.getSpeed().x << std::endl;
+				}*/
+
+				if (sf::Mouse::isButtonPressed(sf::Mouse::Left) && cannon > 10 && cooldownClock.getElapsedTime() > sf::milliseconds(5)) {
+					/*bullets[currentBullet].setSpeed(0, -1000);
+					bullets[currentBullet].move( pad->x(), pad->y() - (e.r() * 2 + 20) );
+					
+					currentBullet++;
+					if(currentBullet >= 5) {
+						currentBullet = 0;
+					}*/
+					for (auto &e : bullets) {
+						e.setSpeed(0, -1000);
+						e.move(pad->x(), pad->y() - (e.r() * 2 + 20) - 25 * currentBullet);
+						currentBullet++;
+						if (currentBullet >= bullets.size()) {
+							currentBullet = 0;
+						}
+					}
+					cooldownClock.restart();
+					cannon -= 10;
 				}
 			}
 			pad->move();
@@ -275,7 +295,45 @@ int game::Run() {
 				if (!balls.empty()) {
 					App.draw(e.sprite());
 				}
-			}			
+			}		
+
+
+			for (auto &e : bullets) {
+				e.move(elapsed_);
+				if (e.y() < PLAYAREA_Y) {
+					e.move(-100, -100);
+					e.setSpeed(0, 0);
+				}
+			}
+
+			for (auto &e : bullets) {
+				if (!bullets.empty()) {
+					App.draw(e.sprite());
+				}
+			}
+
+			for (auto &e : points) {
+				e.move(elapsed_);
+				if (e.y() > PLAYAREA_Y + PLAYAREA_HEIGHT) {
+					e.move(-100, -100);
+					e.setSpeed(0, 0);
+				}
+				collision direction = checkCollision(e, pad);
+				if(direction != collision::none) {
+					e.move(-100, -100);
+					e.setSpeed(0, 0);
+					score += 10;
+					audio.play("point");
+					cannon += 1;
+				}
+				App.draw(e.sprite());
+			}
+			for (auto &e : points) {
+				if (!points.empty()) {
+					//e.move(pad->x(), pad->y());
+				}
+			}
+			
 			/*quad.draw(50);
 			quad.clear();
 
@@ -308,17 +366,35 @@ int game::Run() {
 
 			for (auto &e : bricks) {
 				for (auto &f : balls) {
-				collision direction = checkCollision(f, &e);
-				f.bounce(direction);
-				if(direction != collision::none) {
-				App.draw(e.sprite());
+					collision direction = checkCollision(f, &e);
+					f.bounce(direction);
+					if(direction != collision::none) {
+						App.draw(e.sprite());
+						points[currentPoint].setSpeed(0, 500);
+						points[currentPoint].sprite().rotate(randomInt(0,360));
+						points[currentPoint].move(f.x(), f.y());
+						currentPoint++;
+						if (currentPoint >= 25) {
+							currentPoint = 0;
+						}
+					}
+					infoScore.setString("Score: " + std::to_string(score));					
 				}
-				infoScore.setString("Score: " + std::to_string(score));
-				point.setPosition(f.sprite().getPosition());
+				for (auto &f : bullets) {
+					collision direction = checkCollision(f, &e);
+					if (direction != collision::none) {
+						App.draw(e.sprite());
+						f.move(-100, -100);
+						f.setSpeed(0, 0);
+					}
+					infoScore.setString("Score: " + std::to_string(score));
+					point.setPosition(f.sprite().getPosition());
 				}
 				App.draw(e.sprite());
+
 			}
 
+			
 			for(auto &e:bricks) {
 				bricks.erase(
 				std::remove_if(bricks.begin(), bricks.end(),
@@ -331,22 +407,45 @@ int game::Run() {
 				e.checkCollision();
 				collision direction = checkCollision(e, pad);
 				e.bounce(direction);
-				App.draw(e.sprite());
+				App.draw(e.sprite());				
 			}
 
 
+			for (auto &e : bonuses) {
+				bonuses.erase(
+					std::remove_if(bonuses.begin(), bonuses.end(),
+						[&](bonus &o) { return o.toDelete; }),
+					bonuses.end());
+			}
 
 
-			debug.setString(std::to_string((int)std::floor(1 / elapsed_.asSeconds())));
+			if(balls.empty()) {
+				info.setString("Game over");
+				paused = true;
+				//return -1;
+			}
+			if(bricks.empty()) {
+				info.setString("Level completed");
+				paused = true;
+				nextLevel();
+			}
+			//info.setString("Game over");
+			info.setOrigin(info.getLocalBounds().width / 2, info.getLocalBounds().height / 2);
+			//==========================================================================
+			//RENDER
+			//==========================================================================
+			//debug.setString(std::to_string((int)std::floor(1 / elapsed_.asSeconds())));
 			//std::cout << elapsed_.asSeconds() << std::endl;
+			App.setMouseCursorVisible(false);
 			App.draw(point);
 			App.draw(pad->sprite());
-			App.draw(debug);
-			App.draw(infoScore);
-			App.draw(point);			
+			App.draw(info);
+			App.draw(infoScore);		
 			App.display();
-
 			restartClock();
+		}
+		else {
+			info.setString("Paused");
 		}
 	}
 
@@ -416,7 +515,6 @@ collision game::checkCollision(ball& ball, entity* object) {
 	App.draw(point);*/
 	//if (sqrt(pow(objectX - ballX, 2) + pow(objectY - ballY, 2)) < ball.getLocalBounds().height / 2) {
 	if (pow(objectX - ballX, 2) + pow(objectY - ballY, 2) < pow(ball.r(), 2)) {		
-
 
 		//float offsetX = 0;// objectX - ballX + ball.r();
 		//float offsetY = ballY+ ball.r() - objectY;

@@ -69,4 +69,5 @@ public:
 
 	bool toDelete;
 	bool isPower;
+	bool moving;
 };

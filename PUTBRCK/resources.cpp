@@ -38,6 +38,7 @@ void TextureContainer::init() {
 		//-------------------------------------------------
 
 		tx.loadTexture("assets/textures/background.png", "background");
+		tx.loadTexture("assets/textures/background_empty.png", "backgroundMenu");
 		tx.loadTexture("assets/textures/logo.png", "logo");
 		tx.loadTexture("assets/textures/ball.png", "ball");
 		tx.loadTexture("assets/textures/paddle.png", "paddle");
@@ -47,6 +48,7 @@ void TextureContainer::init() {
 		tx.loadTexture("assets/textures/faster_bonus.png", "bonusFaster");
 		tx.loadTexture("assets/textures/slower_bonus.png", "bonusSlower");
 		tx.loadTexture("assets/textures/ball_bonus.png", "bonusBall");
+		tx.loadTexture("assets/textures/point.png", "point");
 
 		music["bg1_A"].openFromFile("assets/music/PM_ATG_2_100BPM_A.ogg");
 		music["bg1_B"].openFromFile("assets/music/PM_ATG_2_100BPM_B.ogg");
@@ -81,6 +83,9 @@ void TextureContainer::init() {
 		audio.loadAudio("assets/sfx/PM_SA_CINEMATIC_IMPACT_21.ogg", "hit2");
 		audio.loadAudio("assets/sfx/PM_SA_CINEMATIC_IMPACT_32.ogg", "bonus");
 		audio.loadAudio("assets/sfx/PM_SA_CINEMATIC_IMPACT_27.ogg", "ballLost");
+		audio.loadAudio("assets/sfx/PM_CSPH_Cursor_2_short.ogg", "click1");
+		audio.loadAudio("assets/sfx/PM_FN_Objects_Items_Interactions_Menus_40_short.ogg", "click2");
+		audio.loadAudio("assets/sfx/PM_CS_cursor_terminal_short.ogg", "point");
 	}
 }
 

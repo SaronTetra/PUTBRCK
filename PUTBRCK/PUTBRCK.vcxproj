@@ -148,6 +148,7 @@
     <ClCompile Include="imgui_draw.cpp" />
     <ClCompile Include="level.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="menu.cpp" />
     <ClCompile Include="myrandom.cpp" />
     <ClCompile Include="paddle.cpp" />
     <ClCompile Include="quadtree.cpp" />
@@ -163,6 +164,7 @@
     <ClInclude Include="entity.h" />
     <ClInclude Include="game.h" />
     <ClInclude Include="level.h" />
+    <ClInclude Include="menu.h" />
     <ClInclude Include="myrandom.h" />
     <ClInclude Include="paddle.h" />
     <ClInclude Include="quadtree.h" />

@@ -43,3 +43,9 @@ void level::loadBricks(std::vector<brick>& brickList) {
 	//brickList = bricks;
 	std::cout << "Bricks loaded" << std::endl;
 }
+
+void levelContainer::load(std::string fileName, std::string levelName) {
+	level temp;
+	temp.readFromFile("assets/levels/spiral.txt");
+	levels.push_back(temp);
+}

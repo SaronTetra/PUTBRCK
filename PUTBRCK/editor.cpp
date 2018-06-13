@@ -50,7 +50,7 @@ int editor::Run() {
 	int newScore = 1;
 
 	int pickedBonus;
-	bonusType bonusToApply;
+	bonusType bonusToApply = bonusType::none;
 
 
 	sf::RectangleShape outline;
@@ -102,7 +102,7 @@ int editor::Run() {
 			if (event.type == sf::Event::KeyPressed) {
 				switch (event.key.code) {
 				case sf::Keyboard::Escape:
-					return (-1);
+					return (3);
 				case sf::Keyboard::Home:
 					thisGame->resume();
 					return 0;
@@ -133,12 +133,14 @@ int editor::Run() {
 			ImGui::TextColored({ 255,255,0,255 }, "Name can not be empty");
 		}
 		if (ImGui::Button("Save", elemSize)) {
+			audio.play("click1");
 			level_.saveBricks(bricks);
 			if (temp != "") {
 				level_.writeToFile("assets/levels/" + temp + ".txt");
 			}
 		}
 		if (ImGui::Button("Load", elemSize)) {
+			audio.play("click2");
 			level_.readFromFile("assets/levels/" + temp + ".txt");
 			level_.loadBricks(bricks);
 			for (auto &e : bricks) {
@@ -157,6 +159,7 @@ int editor::Run() {
 
 		ImGui::Columns(2);
 		if (ImGui::Button("Clear", { (elemSize.x) / 2, elemSize.y })) {
+			audio.play("click1");
 			ImGui::OpenPopup("Clear?");
 		}
 		if (ImGui::BeginPopupModal("Clear?", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
@@ -167,12 +170,14 @@ int editor::Run() {
 			//static int dummy_i = 0;
 			//ImGui::Combo("Combo", &dummy_i, "Delete\0Delete harder\0");
 			if (ImGui::Button("OK", ImVec2(120, 0))) {
+				audio.play("click1");
 				bricks.clear();
 				ImGui::CloseCurrentPopup();
 			}
 			ImGui::SetItemDefaultFocus();
 			ImGui::SameLine();
 			if (ImGui::Button("Cancel", ImVec2(120, 0))) {
+				audio.play("click1");
 				ImGui::CloseCurrentPopup();
 			}
 			ImGui::EndPopup();
@@ -180,6 +185,7 @@ int editor::Run() {
 
 		ImGui::NextColumn();
 		if(ImGui::Button("Fill", { (elemSize.x) / 2, elemSize.y })) {
+			audio.play("click1");
 			ImGui::OpenPopup("Fill?");
 		}
 		if (ImGui::BeginPopupModal("Fill?", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
@@ -188,6 +194,7 @@ int editor::Run() {
 			ImGui::Separator();
 
 			if (ImGui::Button("OK", ImVec2(120, 0))) {
+				audio.play("click1");
 				bricks.clear();
 				for (float i = 0; i < 18; ++i) {
 					for (float j = 0; j < 15; ++j) {						
@@ -201,6 +208,7 @@ int editor::Run() {
 			ImGui::SetItemDefaultFocus();
 			ImGui::SameLine();
 			if (ImGui::Button("Cancel", ImVec2(120, 0))) {
+				audio.play("click1");
 				ImGui::CloseCurrentPopup();
 			}
 			ImGui::EndPopup();
@@ -345,10 +353,12 @@ int editor::Run() {
 			static ImVec4 ref_color_v = selectedBrick->sprite().getColor();
 			ImGui::Columns(2);
 			if (ImGui::Button("Set color", elemSizeHalf)) {
+				audio.play("click1");
 				selectedBrick->sprite().setColor(color);
 			}
 			ImGui::NextColumn();
 			if (ImGui::Button("Remove", elemSizeHalf)) {
+				audio.play("click1");
 				bricks.erase(
 					std::remove_if(bricks.begin(), bricks.end(),
 						[&](brick &o) { return selectedBrick->x() == o.x() && selectedBrick->y() == o.y(); }),
@@ -380,13 +390,13 @@ int editor::Run() {
 				break;
 			}
 			if (ImGui::Button("Apply", elemSizeHalf)) {
+				audio.play("click1");
 				selectedBrick->setHealth(newHealth);
 				selectedBrick->setPoints(newScore * 100);
 				selectedBrick->setBonus(bonusToApply);
 			}
 			
 		}
-
 
 		ImGui::GetIO().FontGlobalScale = 2.5f;
 		ImGui::End();

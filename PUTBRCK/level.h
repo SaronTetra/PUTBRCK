@@ -17,7 +17,8 @@ public:
 
 class levelContainer {
 private:
-	std::map<std::string, level> texture;
+	//std::map<std::string, level> level_;
+	std::vector<level> levels;
 public:
 	levelContainer();
 	~levelContainer();

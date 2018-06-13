@@ -5,13 +5,16 @@ Maciej Stosik
 
 SOUND EFFECTS
 All sound effects by Phil Michalski
-https://pmsfx.squarespace.com/
+https://pmsfx.com/
 
 
 
 MUSIC
 Retro Dream by Vignesh Ramesh
 https://soundcloud.com/vramazing/retro-dream
+
+Along The Grid 2 by Phil Michalski
+https://pmsfx.com/
 
 
 
@@ -21,6 +24,18 @@ https://www.indiantypefoundry.com/
 https://fonts.google.com/specimen/Sarpanch
 
 
+MAPS
+by Maciej Stosik
+
+LIBRARIES
+SFML
+https://www.sfml-dev.org/
+
+Dear ImGui
+https://github.com/ocornut/imgui
+
+ImGui SFML
+https://github.com/eliasdaler/imgui-sfml
 
 
 

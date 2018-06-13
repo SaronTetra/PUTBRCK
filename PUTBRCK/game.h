@@ -32,25 +32,36 @@ private:
 	//std::map<std::string, sf::Music> music;  //plays directyl from a file, no buffer
 	sf::Sprite sp_background;
 	sf::Font font;
-	sf::Text debug;
+	sf::Text info;
 	sf::Text infoScore;
 
 	sf::Time elapsed_;
 	sf::Clock clock_;
+	sf::Clock cooldownClock;
 
 	std::vector<ball> balls;
+	std::vector<ball> bullets;
+	std::vector<ball> points;
 	std::vector<brick> bricks;
 	std::vector<bonus> bonuses;
 	paddle * pad;
 	sf::CircleShape point;
 
 	level level_;
+	//levelContainer levels;
+	std::vector<level> levels;
+	int currentLevel;
+
+	int currentBullet;
+	int currentPoint;
+	int cannon;
 
 	int score;
 	bool running;
 	bool paused;
 public:
 	game(sf::RenderWindow &App);
+	void nextLevel();
 	int Run() override;
 
 	sf::Time getElapsed();
