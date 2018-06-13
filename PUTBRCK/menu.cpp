@@ -3,7 +3,7 @@
 #include <string>
 
 
-menu::menu(sf::RenderWindow & App, game* thisGame) : App(App) {
+menu::menu(sf::RenderWindow & App, game* thisGame) : App(App), thisGame(thisGame) {
 	sp_logo.setTexture(tx["logo"]);
 	sp_logo.setColor(sf::Color(255, 255, 255, 255));
 	sp_logo.setOrigin(sp_logo.getLocalBounds().width / 2, sp_logo.getLocalBounds().height / 2);
@@ -18,7 +18,7 @@ menu::menu(sf::RenderWindow & App, game* thisGame) : App(App) {
 		throw - 1;
 	}
 
-	menuText = { "Start", "Editor", "Credits", "Quit" };
+	menuText = { "Start", "Restart", "Editor", "Credits", "Quit"};
 	sf::Vector2f lastPos = { sp_logo.getPosition().x, sp_logo.getPosition().y + 100 };
 	for (auto& e : menuText) {
 		sf::Text temp;
@@ -101,6 +101,10 @@ int menu::Run() {
 					}
 					if(e.getString() == "Quit") {
 						return -1;
+					}
+					if(e.getString() == "Restart") {
+						thisGame->restart();
+						return 0;
 					}
 				}
 			}

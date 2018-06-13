@@ -398,6 +398,29 @@ int editor::Run() {
 			
 		}
 
+		if(ImGui::Button("Play", elemSize)) {		
+			audio.play("click1");
+			ImGui::OpenPopup("Play?");
+		}
+		if (ImGui::BeginPopupModal("Play?", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
+			focused = true;
+			ImGui::Text("Ready to play?");
+			ImGui::Separator();
+
+			if (ImGui::Button("Yes", ImVec2(120, 0))) {
+				audio.play("click2");
+				thisGame->restart(InputBuf);				
+				ImGui::CloseCurrentPopup();
+			}
+			ImGui::SetItemDefaultFocus();
+			ImGui::SameLine();
+			if (ImGui::Button("No", ImVec2(120, 0))) {
+				audio.play("click1");
+				ImGui::CloseCurrentPopup();
+			}
+			ImGui::EndPopup();
+		}
+
 		ImGui::GetIO().FontGlobalScale = 2.5f;
 		ImGui::End();
 		sp_background.setColor(sf::Color(255, 255, 255, 255));

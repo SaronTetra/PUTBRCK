@@ -12,6 +12,7 @@
 #define PLAYAREA_HEIGHT  850
 #define PLAYAREA_X  410
 #define PLAYAREA_Y  110
+#define VOLUME  50
 
 //
 //

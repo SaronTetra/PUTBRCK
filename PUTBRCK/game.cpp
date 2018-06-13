@@ -23,22 +23,19 @@ game::game(sf::RenderWindow &App) : App(App) {
 	infoScore.setCharacterSize(48);
 	infoScore.setPosition({ 10, 10 });
 
+	infoCannon.setFont(font);
+	infoCannon.setCharacterSize(48);
+	infoCannon.setPosition({ 10, 100 });
+	infoCannon.setString("Cannon: ");
+
 	sp_background.setTexture(tx["background"]);
 	sp_background.setColor(sf::Color(255, 255, 255, 255));
 	if (!font.loadFromFile("assets/fonts/Sarpanch-Regular.ttf")) {
 		std::cerr << "Error loading Sarpanch-Regular.ttf" << std::endl;
 		throw - 1;
 	}
-	for (int i = 0; i < 1; i++) {
-		//balls.emplace_back(ball(App, tx["ball"], { 500, 500 }, { 100.0f+i*400.0f, 500.0f }));
-	}
 	pad = new paddle(App, tx["paddle"]);
 
-	/*for (float i = 0; i < 18; ++i) {
-		for (float j = 0; j < 10; ++j) {
-			bricks.emplace_back(brick(tx["brick"], 1, 100, { i * tx["brick"].getSize().x + PLAYAREA_X + tx["brick"].getSize().x / 2 + 10, j * tx["brick"].getSize().y + PLAYAREA_Y + tx["brick"].getSize().y / 2 + 10 }));
-		}
-	}*/
 
 		currentLevel = 0;
 		level temp;
@@ -49,28 +46,13 @@ game::game(sf::RenderWindow &App) : App(App) {
 		temp.readFromFile("assets/levels/official/c4.txt"); levels.push_back(temp);
 		temp.readFromFile("assets/levels/official/c5.txt"); levels.push_back(temp);
 		temp.readFromFile("assets/levels/official/c6.txt"); levels.push_back(temp);
-		
-	
 
-		//level_.readFromFile("assets/levels/spiral.txt");
+
 		levels[currentLevel].loadBricks(bricks);
 		for (auto &e : bricks) {
 			e.setTexture(tx["brick"]);
 		}
 
-
-	//quad.clear();
-	//quad.fill();
-
-	//for (auto& e : bricks) {
-	//	quad.insert(&e);
-	//}
-
-	//for (auto& e : balls) {
-	//	quad.insert(&e);
-	//}
-
-	//bonuses.emplace_back(bonus(App, tx["bonus"], { 0, 100 }, { 500.0f, 500.0f }));
 
 	balls.emplace_back(ball(App, tx["ball"], { 300, 300 }, { pad->x(), pad->y() + 10 }));
 	balls.back().moving = false;
@@ -83,6 +65,7 @@ game::game(sf::RenderWindow &App) : App(App) {
 	cannon = 0;
 	cannonFire = true;
 	bool laserPlayed = false;
+	toReset = false;
 }
 
 //==========================================================================
@@ -92,7 +75,12 @@ void game::nextLevel() {
 	if (currentLevel >= levels.size() - 1) {
 		return;
 	}
+	if(toReset) {
+		currentLevel = -1;
+		
+	}
 	++currentLevel;
+	std::cout << "Current level: " << currentLevel << std::endl;
 	levels[currentLevel].loadBricks(bricks);
 	for (auto &e : bricks) {
 		e.setTexture(tx["brick"]);
@@ -102,6 +90,7 @@ void game::nextLevel() {
 	balls.back().moving = false;	
 	paused = false;	
 	laserScale = 1;
+	toReset = false;
 	
 }
 
@@ -159,6 +148,10 @@ int game::Run() {
 				case sf::Keyboard::U:
 					nextLevel();
 					resume();
+					break;
+				case sf::Keyboard::R:
+					restart();
+					break;
 				default:
 					break;
 				}
@@ -167,7 +160,7 @@ int game::Run() {
 		if (!paused) {
 			switch (currentLevel) {
 			case 0:
-				music["bg1_A"].setVolume(100);
+				music["bg1_A"].setVolume(VOLUME);
 				music["bg1_B"].setVolume(0);
 				music["bg1_C"].setVolume(0);
 				music["bg1_D"].setVolume(0);
@@ -176,7 +169,7 @@ int game::Run() {
 				break;
 			case 1:
 				music["bg1_A"].setVolume(0);
-				music["bg1_B"].setVolume(100);
+				music["bg1_B"].setVolume(VOLUME);
 				music["bg1_C"].setVolume(0);
 				music["bg1_D"].setVolume(0);
 				music["bg1_E"].setVolume(0);
@@ -185,7 +178,7 @@ int game::Run() {
 			case 2:
 				music["bg1_A"].setVolume(0);
 				music["bg1_B"].setVolume(0);
-				music["bg1_C"].setVolume(100);
+				music["bg1_C"].setVolume(VOLUME);
 				music["bg1_D"].setVolume(0);
 				music["bg1_E"].setVolume(0);
 				music["bg1_F"].setVolume(0);
@@ -194,7 +187,7 @@ int game::Run() {
 				music["bg1_A"].setVolume(0);
 				music["bg1_B"].setVolume(0);
 				music["bg1_C"].setVolume(0);
-				music["bg1_D"].setVolume(100);
+				music["bg1_D"].setVolume(VOLUME);
 				music["bg1_E"].setVolume(0);
 				music["bg1_F"].setVolume(0);
 				break;
@@ -203,7 +196,7 @@ int game::Run() {
 				music["bg1_B"].setVolume(0);
 				music["bg1_C"].setVolume(0);
 				music["bg1_D"].setVolume(0);
-				music["bg1_E"].setVolume(100);
+				music["bg1_E"].setVolume(VOLUME);
 				music["bg1_F"].setVolume(0);
 				break;
 			case 5:
@@ -212,7 +205,7 @@ int game::Run() {
 				music["bg1_C"].setVolume(0);
 				music["bg1_D"].setVolume(0);
 				music["bg1_E"].setVolume(0);
-				music["bg1_F"].setVolume(100);
+				music["bg1_F"].setVolume(VOLUME);
 				break;
 			default:
 				//audio.play("hit2");
@@ -239,10 +232,11 @@ int game::Run() {
 				}		
 			}
 			
-			if (sf::Mouse::isButtonPressed(sf::Mouse::Left) && cannon > 10 && 
+			if (sf::Mouse::isButtonPressed(sf::Mouse::Left) && cannon >= 10 && 
 				cooldownClock.getElapsedTime() > sf::milliseconds(1000) && 
 				!cannonFire) {
-				
+				infoCannon.setString("Cannon: ");
+				infoCannon.setFillColor(sf::Color::White);
 				laserScale = 1;
 				cannon -= 10;
 				cooldownClock.restart();
@@ -273,8 +267,8 @@ int game::Run() {
 						laserPlayed = true;
 					}				
 					laser.setPosition(pad->x(), PLAYAREA_Y);
-					laser.setScale({ laserScale, 0.9f });	
-					laser.setColor(sf::Color(255-laserScale*1, 255 - laserScale * 1, 0));
+					laser.setScale({ laserScale, 0.95f });	
+					laser.setColor(sf::Color(255-laserScale*1, 100 - laserScale * 1, 0));
 					laserScale -= 0.05;
 					std::cout << laser.getScale().x << std::endl;
 					App.draw(laser);							
@@ -316,8 +310,13 @@ int game::Run() {
 					e.move(-100, -100);
 					e.setSpeed(0, 0);
 					score += 10;
-					audio.play("point");
-					cannon += 1;
+					audio.play("point");					
+					if (cannon <= 10) {
+						infoCannon.setString(infoCannon.getString() + "|");
+						cannon++;
+					}else {
+						infoCannon.setFillColor(sf::Color::Yellow);
+					}
 				}
 				App.draw(e.sprite());
 			}
@@ -353,7 +352,14 @@ int game::Run() {
 				App.draw(e.sprite());
 
 			}
-
+			if(bricks.size() <=5) {
+				if (cannon <= 10) {
+					infoCannon.setString(infoCannon.getString() + "|");
+					cannon++;
+				} else {
+					infoCannon.setFillColor(sf::Color::Yellow);
+				}
+			}
 			
 			for(auto &e:bricks) {
 				bricks.erase(
@@ -401,6 +407,7 @@ int game::Run() {
 			App.draw(pad->sprite());
 			App.draw(info);
 			App.draw(infoScore);		
+			App.draw(infoCannon);		
 			App.display();
 			restartClock();
 		}
@@ -541,4 +548,85 @@ collision game::checkCollision(ball& ball, entity* object) {
 
 	}
 	return collision::none;
-};
+}
+
+
+void game::restart() {
+	running = true;
+	paused = false;
+
+	infoCannon.setString("Cannon: ");
+
+	currentLevel = 0;
+	//toReset = true;
+	//nextLevel();
+	levels.clear();
+	balls.clear();
+	bonuses.clear();
+	for(auto& e:points) {
+		e.move(-100, -100);
+		e.setSpeed(0, 0);
+	}
+	level temp;
+	temp.readFromFile("assets/levels/official/c0.txt"); levels.push_back(temp);
+	temp.readFromFile("assets/levels/official/c1.txt"); levels.push_back(temp);
+	temp.readFromFile("assets/levels/official/c2.txt"); levels.push_back(temp);
+	temp.readFromFile("assets/levels/official/c3.txt"); levels.push_back(temp);
+	temp.readFromFile("assets/levels/official/c4.txt"); levels.push_back(temp);
+	temp.readFromFile("assets/levels/official/c5.txt"); levels.push_back(temp);
+	temp.readFromFile("assets/levels/official/c6.txt"); levels.push_back(temp);
+	levels[currentLevel].loadBricks(bricks);
+	for (auto &e : bricks) {
+		e.setTexture(tx["brick"]);
+	}
+
+	balls.emplace_back(ball(App, tx["ball"], { 300, 300 }, { pad->x(), pad->y() + 10 }));
+	balls.back().moving = false;
+
+	score = 0;
+
+	currentPoint = 0;
+	cannon = 0;
+	cannonFire = true;
+	bool laserPlayed = false;
+	
+}
+
+
+
+void game::restart(std::string levelName) {
+	running = true;
+	paused = false;
+
+	infoCannon.setString("Cannon: ");
+
+	currentLevel = 0;
+	//toReset = true;
+	//nextLevel();
+	levels.clear();
+	balls.clear();
+	bonuses.clear();
+	for (auto& e : points) {
+		e.move(-100, -100);
+		e.setSpeed(0, 0);
+	}
+	level temp;
+	temp.readFromFile("assets/levels/"+ levelName +".txt"); levels.push_back(temp);
+	temp.readFromFile("assets/levels/official/c6.txt"); levels.push_back(temp);
+	levels[currentLevel].loadBricks(bricks);
+	for (auto &e : bricks) {
+		e.setTexture(tx["brick"]);
+	}
+
+	balls.emplace_back(ball(App, tx["ball"], { 300, 300 }, { pad->x(), pad->y() + 10 }));
+	balls.back().moving = false;
+
+	score = 0;
+
+	currentPoint = 0;
+	cannon = 0;
+	cannonFire = true;
+	bool laserPlayed = false;
+
+}
+

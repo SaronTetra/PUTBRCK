@@ -34,6 +34,7 @@ private:
 	sf::Font font;
 	sf::Text info;
 	sf::Text infoScore;
+	sf::Text infoCannon;
 
 	sf::Time elapsed_;
 	sf::Clock clock_;
@@ -62,6 +63,8 @@ private:
 	int score;
 	bool running;
 	bool paused;
+
+	bool toReset;
 public:
 	game(sf::RenderWindow &App);
 	void nextLevel();
@@ -77,4 +80,8 @@ public:
 		paused = false;
 	}
 	collision checkCollision(ball &ball, entity *object);
+	void restart();
+	void restart(std::string levelName);
+
+	int getScore() { return score; }
 };
