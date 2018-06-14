@@ -17,6 +17,7 @@
 #include "bonus.h"
 #include "quadtree.h"
 #include "level.h"
+#include "particles.h"
 
 
 #define M_PI 3.14159265358979323846
@@ -45,6 +46,7 @@ private:
 	std::vector<ball> points;
 	std::vector<brick> bricks;
 	std::vector<bonus> bonuses;
+	std::vector<particles> particles_;
 	paddle * pad;
 	sf::CircleShape point;
 

@@ -91,6 +91,7 @@ int menu::Run() {
 				e.setFillColor(sf::Color(244, 59, 154));
 				if(sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
 					if(e.getString() == "Start") {
+						thisGame->resume();
 						return 0;
 					}
 					if(e.getString() == "Editor") {
@@ -104,6 +105,7 @@ int menu::Run() {
 					}
 					if(e.getString() == "Restart") {
 						thisGame->restart();
+						thisGame->resume();
 						return 0;
 					}
 				}

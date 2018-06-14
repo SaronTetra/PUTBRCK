@@ -117,7 +117,7 @@ int editor::Run() {
 		//GUI
 		//==========================================================================
 		ImGui::SFML::Update(App, elapsed_);
-		ImGui::ShowDemoWindow();
+		//ImGui::ShowDemoWindow();
 		ImGui::SetNextWindowPos({ PLAYAREA_X + PLAYAREA_WIDTH, 0 });
 		ImGui::SetNextWindowSize({ App.getSize().x - PLAYAREA_X - PLAYAREA_WIDTH + 0.f, App.getSize().y + 0.f });
 		ImGui::Begin("editor");

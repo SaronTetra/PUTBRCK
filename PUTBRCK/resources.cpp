@@ -50,6 +50,7 @@ void TextureContainer::init() {
 		tx.loadTexture("assets/textures/ball_bonus.png", "bonusBall");
 		tx.loadTexture("assets/textures/point.png", "point");
 		tx.loadTexture("assets/textures/laser.png", "laser");
+		tx.loadTexture("assets/textures/particle.png", "particle");
 
 		music["bg1_A"].openFromFile("assets/music/PM_ATG_2_100BPM_A.ogg");
 		music["bg1_B"].openFromFile("assets/music/PM_ATG_2_100BPM_B.ogg");

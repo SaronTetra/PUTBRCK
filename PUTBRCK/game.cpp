@@ -152,6 +152,19 @@ int game::Run() {
 				case sf::Keyboard::R:
 					restart();
 					break;
+				case sf::Keyboard::B:					
+					particles_.emplace_back(particles(App, tx["point"], 100, sf::Color(255,0,255)));
+					particles_.back().spawn(500, 500);
+					break;
+				case sf::Keyboard::Z:
+					points[currentPoint].setSpeed(0, 500);
+					points[currentPoint].sprite().rotate(randomInt(0, 360));
+					points[currentPoint].move(pad->x(), pad->y() - 100);
+					currentPoint++;
+					if (currentPoint >= 25) {
+						currentPoint = 0;
+					}
+					break;
 				default:
 					break;
 				}
@@ -256,22 +269,26 @@ int game::Run() {
 					temp.setSize({ 1, laser.getLocalBounds().height });
 					App.draw(temp);
 				}
-				else if(time < 2000 && laserScale > 0) {
+				else if (laserScale > 0) {
 					if (!laserPlayed) {
 						for (auto& e : bricks) {
-							if (e.x1() < pad->x() + laser.getLocalBounds().width/2 && e.x2() > pad->x()-laser.getLocalBounds().width / 2) {
+							if (e.x1() < pad->x() + laser.getLocalBounds().width / 2 && e.x2() > pad->x() - laser.getLocalBounds().width / 2) {
+								particles_.emplace_back(particles(App, tx["point"], 50, e.sprite().getColor()));
+								particles_.back().spawn(e.x(), e.y());
 								e.toDelete = true;
 							}
 						}
 						audio.play("laser");
 						laserPlayed = true;
-					}				
-					laser.setPosition(pad->x(), PLAYAREA_Y);
-					laser.setScale({ laserScale, 0.95f });	
-					laser.setColor(sf::Color(255-laserScale*1, 100 - laserScale * 1, 0));
-					laserScale -= 0.05;
-					std::cout << laser.getScale().x << std::endl;
-					App.draw(laser);							
+					}
+					laserScale -= 0.01;
+					if (laserScale > 0.01) {
+						laser.setPosition(pad->x(), PLAYAREA_Y);
+						laser.setScale({ laserScale, 0.95f });
+						laser.setColor(sf::Color(255, 100, 0, 255 - cooldownClock.getElapsedTime().asSeconds() * 50));
+						std::cout << 255 - cooldownClock.getElapsedTime().asSeconds() * 100 << std::endl;
+						App.draw(laser);
+					}
 				}
 				else {					
 					cannonFire = false;					
@@ -321,14 +338,22 @@ int game::Run() {
 				App.draw(e.sprite());
 			}
 			
-	
+			for(auto& e:particles_) {
+				e.move(elapsed_);
+				for (auto& f : e.getVector())
+					App.draw(f.sp_part);
+			}
 
 			for (auto &e : bricks) {
 				for (auto &f : balls) {
+					float tempX = e.sprite().getPosition().x;
+					float tempY = e.sprite().getPosition().y;
 					collision direction = checkCollision(f, &e);
-					f.bounce(direction);
+					f.bounce(direction);					
 					if(direction != collision::none) {
 						App.draw(e.sprite());
+						particles_.emplace_back(particles(App, tx["point"], 25, e.sprite().getColor()));
+						particles_.back().spawn(tempX, tempY);
 						points[currentPoint].setSpeed(0, 500);
 						points[currentPoint].sprite().rotate(randomInt(0,360));
 						points[currentPoint].move(f.x(), f.y());
